@@ -1,0 +1,12 @@
+name = "loggable-test"
+compatibility_date = "2023-09-11"
+main = "example.ts"
+dev.port = 3000
+
+[[durable_objects.bindings]]
+name = "EXAMPLE_LOG_DO"
+class_name = "ExampleLogDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ExampleLogDO"]
