@@ -2,6 +2,8 @@ name = "loggable-test"
 compatibility_date = "2023-09-11"
 main = "example.ts"
 dev.port = 3000
+route.custom_domain = true
+route.pattern = "loggable.itscooldo.com"
 
 [[durable_objects.bindings]]
 name = "EXAMPLE_LOG_DO"
