@@ -1,8 +1,8 @@
 // @ts-check
 /// <reference lib="esnext" />
-/// <reference types="@cloudflare/workers-types" />
+/// <reference path="./worker-configuration.d.ts" />
 
-import { DurableObject } from "cloudflare:workers";
+import { RpcTarget } from "cloudflare:workers";
 
 type LogLevel = "info" | "warn" | "error";
 type LogFilter = {
@@ -20,15 +20,18 @@ export type Log = {
   level: LogLevel;
   message: string;
 };
-export class LoggableObject extends DurableObject {
+
+export type LoggerOptions = {};
+export class Logger extends RpcTarget {
   // Default log retention period in hours
   protected retainLogHours = 30 * 24; // 30 days
 
   constructor(
     public readonly ctx: DurableObjectState,
     public readonly env: any,
+    options: LoggerOptions = {}
   ) {
-    super(ctx, env);
+    super();
 
     // Create logs table if it doesn't exist
     this.ctx.storage.sql.exec(`
@@ -68,7 +71,7 @@ export class LoggableObject extends DurableObject {
       `INSERT INTO _logs (timestamp, level, message) VALUES (?, ?, ?)`,
       timestamp,
       level,
-      messageStr,
+      messageStr
     );
 
     // Clean up old logs in waitUntil to not block the main execution

@@ -1,12 +1,11 @@
 import { DurableObject } from "cloudflare:workers";
-import { LoggableObject } from "./loggable-object";
+import { WithLogger, withLogger } from "./withLogger";
 
-export class ExampleLogDO extends LoggableObject {
-  constructor(ctx: DurableObjectState, env: any) {
+export class ExampleLogDO extends withLogger(DurableObject<Env>, {
+  logRetentionHours: 7 * 24,
+}) {
+  constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-
-    // Set custom log retention period (in hours) if needed
-    this.retainLogHours = 7 * 24; // 7 days
 
     // Create dummy table and data
     this.ctx.storage.sql.exec(`
@@ -93,7 +92,7 @@ export class ExampleLogDO extends LoggableObject {
 
 // Worker handler
 export default {
-  async fetch(request: Request, env: any): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const doId = env.EXAMPLE_LOG_DO.idFromName("example-log-instance");
     const doStub = env.EXAMPLE_LOG_DO.get(doId);
     return doStub.fetch(request);
