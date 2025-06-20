@@ -23,14 +23,6 @@ See [example.ts](example.ts) and [wrangler.toml](wrangler.toml)
 - **Filtering & Searching**: Get exactly the logs you need
 - **Chronological Order**: Logs are displayed oldest-first for better readability
 
-## Technical Details
-
-- **Persistent Logging**: All logs are stored in a SQLite table named `_logs`
-- **Retention**: Logs older than 30 days are automatically cleaned up (NB: Only if new logs come in!)
-- **Performance**: Indexed by timestamp for efficient querying
-- **Streaming**: Uses TransformStream for real-time log delivery
-- **Memory**: Logs are streamed directly from storage, no memory buffering
-
 ## Log Levels
 
 The `log` method accepts a log level as the first parameter:
