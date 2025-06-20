@@ -8,8 +8,6 @@ A TypeScript decorator that adds logging capabilities to Cloudflare Durable Obje
 npm install loggable-object
 ```
 
-````
-
 ## Usage
 
 ```typescript
@@ -201,4 +199,3 @@ log: Log; // (type: LogLevel, ...data: any[]) => void
 ```
 
 Where `LogLevel` is `"log" | "warn" | "error"`.
-````

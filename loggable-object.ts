@@ -54,6 +54,10 @@ export function Loggable<T extends new (...args: any[]) => DurableObject>(
     }
 
     log: Log = (type: LogLevel, ...data: any[]): void => {
+      const original = console[type];
+      if (original) {
+        original(...data);
+      }
       const timestamp = new Date().toISOString();
       const message = data
         .map((d) => (typeof d === "string" ? d : JSON.stringify(d, null, 2)))
@@ -86,9 +90,10 @@ export function Loggable<T extends new (...args: any[]) => DurableObject>(
 
       for (const writer of this.logSubscribers) {
         try {
-          const line = `[${
-            logEntry.timestamp
-          }] ${logEntry.level.toUpperCase()}: ${logEntry.message}\n`;
+          const line = `[${logEntry.timestamp.slice(
+            0,
+            -5,
+          )}] ${logEntry.level.toUpperCase()}: ${logEntry.message}\n`;
           const chunk = new TextEncoder().encode(line);
           writer.write(chunk);
         } catch (error) {
@@ -240,9 +245,10 @@ export function Loggable<T extends new (...args: any[]) => DurableObject>(
       try {
         // Send initial logs (already in chronological order - oldest first)
         for (const log of initialLogs) {
-          const line = `[${log.timestamp}] ${log.level.toUpperCase()}: ${
-            log.message
-          }\n`;
+          const line = `[${log.timestamp.slice(
+            0,
+            -5,
+          )}] ${log.level.toUpperCase()}: ${log.message}\n`;
           const chunk = new TextEncoder().encode(line);
           await writer.write(chunk);
         }

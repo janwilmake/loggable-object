@@ -4,22 +4,22 @@ import { Loggable, Log } from "./loggable-object";
 @Loggable
 export class ExampleLogDO extends DurableObject {
   log: Log;
+  state: DurableObjectState;
+  constructor(state: DurableObjectState, env: any) {
+    super(state, env);
+    this.state = state;
+    state.storage.setAlarm(Date.now() + 10000);
+    // this.log("log", "alarm has been set 60 seconds from now");
+  }
 
-  constructor(ctx: DurableObjectState, env: any) {
-    super(ctx, env);
+  alarm() {
+    this.log("log", "10secondly alarm fired and new alarm set");
+    this.state.storage.setAlarm(Date.now() + 10000);
   }
 
   async fetch(request: Request): Promise<Response> {
-    this.log("log", "Handling request:", request.url);
-
-    try {
-      // Your logic here
-      this.log("log", "Request processed successfully");
-      return new Response("OK");
-    } catch (error) {
-      this.log("error", "Request failed:", error);
-      return new Response("Error", { status: 500 });
-    }
+    this.log("log", "Request made");
+    return new Response("Found DO. curl /log to stream logs to your terminal");
   }
 }
 
