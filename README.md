@@ -1,60 +1,35 @@
 # Loggable Object
 
-A TypeScript decorator that adds logging capabilities to Cloudflare Durable Objects with persistent storage and live streaming.
+A TypeScript decorator that adds logging capabilities to Cloudflare Durable Objects with persistent storage and live streaming. Especially useful for logging in alarms in production DOs as these aren't normally visible.
 
-## Installation
-
-```bash
-npm install loggable-object
-```
+[![](https://badge.xymake.com/janwilmake/status/1936045989443326226)](https://x.com/janwilmake/status/1936045989443326226)
 
 ## Usage
 
-```typescript
-import { DurableObject } from "cloudflare:workers";
-import { Loggable, Log } from "loggable-object";
+1. `npm i loggable-object`
+2. Add `@Loggable` before your DO, and `log: Log;` as first line in your DO (for type safety)
+3. Use logs anywhere, also in alarms, via `this.log`
+4. Expose your DO `/log` endpoint safely
+5. `curl https://yourworker.com/log` for a log stream!
 
-@Loggable
-export class MyDurableObject extends DurableObject {
-  // Needed for typesafety
-  log: Log;
+## Complete example
 
-  constructor(ctx: DurableObjectState, env: any) {
-    super(ctx, env);
-
-    // Start using logging methods
-    this.log("log", "Application started");
-    this.log("warn", "Something suspicious");
-    this.log("error", "Something went wrong");
-
-    // You can also log objects
-    this.log("log", { event: "startup", status: "success" });
-  }
-
-  async fetch(request: Request): Promise<Response> {
-    this.log("log", "Handling request:", request.url);
-
-    try {
-      // Your logic here
-      this.log("log", "Request processed successfully");
-      return new Response("OK");
-    } catch (error) {
-      this.log("error", "Request failed:", error);
-      return new Response("Error", { status: 500 });
-    }
-  }
-}
-```
+See [example.ts](example.ts) and [wrangler.toml](wrangler.toml)
 
 ## Features
 
 - **TypeScript Decorator**: Clean decorator syntax using `@Loggable`
-- **Persistent Logging**: All logs are stored in a SQLite table named `_logs`
 - **Multiple Log Levels**: Support for `log` (info), `warn`, and `error` levels
-- **Automatic Log Cleanup**: Older logs are automatically removed (30 days retention by default)
-- **Live Streaming**: Real-time log streaming via text/plain HTTP endpoint
 - **Filtering & Searching**: Get exactly the logs you need
 - **Chronological Order**: Logs are displayed oldest-first for better readability
+
+## Technical Details
+
+- **Persistent Logging**: All logs are stored in a SQLite table named `_logs`
+- **Retention**: Logs older than 30 days are automatically cleaned up (NB: Only if new logs come in!)
+- **Performance**: Indexed by timestamp for efficient querying
+- **Streaming**: Uses TransformStream for real-time log delivery
+- **Memory**: Logs are streamed directly from storage, no memory buffering
 
 ## Log Levels
 
@@ -108,23 +83,3 @@ Available filter parameters:
 - `to`: End timestamp (ISO string)
 - `limit`: Maximum number of logs to return (default: 100)
 - `offset`: Pagination offset
-
-## Complete example
-
-See [example.ts](example.ts) and [wrangler.toml](wrangler.toml)
-
-## Technical Details
-
-- **Storage**: Uses SQLite storage with automatic table creation
-- **Retention**: Logs older than 30 days are automatically cleaned up (NB: Only if new logs come in!)
-- **Performance**: Indexed by timestamp for efficient querying
-- **Streaming**: Uses TransformStream for real-time log delivery
-- **Memory**: Logs are streamed directly from storage, no memory buffering
-
-## TypeScript Support
-
-The package includes full TypeScript definitions. The `@Loggable` decorator provides the `log` method, but you still need to type it like this:
-
-```typescript
-log: Log;
-```
