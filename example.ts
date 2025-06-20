@@ -8,18 +8,19 @@ export class ExampleLogDO extends DurableObject {
   constructor(state: DurableObjectState, env: any) {
     super(state, env);
     this.state = state;
-    state.storage.setAlarm(Date.now() + 10000);
-    // this.log("log", "alarm has been set 60 seconds from now");
+    state.storage.setAlarm(Date.now() + 3600 * 1000);
   }
 
   alarm() {
-    this.log("log", "10secondly alarm fired and new alarm set");
-    this.state.storage.setAlarm(Date.now() + 10000);
+    this.log("log", "hourly alarm fired and new alarm set");
+    this.state.storage.setAlarm(Date.now() + 3600 * 1000);
   }
 
   async fetch(request: Request): Promise<Response> {
     this.log("log", "Request made");
-    return new Response("Found DO. curl /log to stream logs to your terminal");
+    return new Response(
+      "Found DO. curl /log to stream logs to your terminal or browser. A new alarm log will appear there hourly",
+    );
   }
 }
 

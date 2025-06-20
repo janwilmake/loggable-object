@@ -16,6 +16,7 @@ import { Loggable, Log } from "loggable-object";
 
 @Loggable
 export class MyDurableObject extends DurableObject {
+  // Needed for typesafety
   log: Log;
 
   constructor(ctx: DurableObjectState, env: any) {
@@ -108,79 +109,9 @@ Available filter parameters:
 - `limit`: Maximum number of logs to return (default: 100)
 - `offset`: Pagination offset
 
-## Complete Example
+## Complete example
 
-```typescript
-import { DurableObject } from "cloudflare:workers";
-import { Loggable, Log } from "loggable-object";
-
-@Loggable
-export class ExampleLogDO extends DurableObject {
-  log: Log;
-
-  constructor(ctx: DurableObjectState, env: any) {
-    super(ctx, env);
-    this.log("log", "ExampleLogDO initialized");
-  }
-
-  async fetch(request: Request): Promise<Response> {
-    const url = new URL(request.url);
-
-    this.log("log", "Handling request:", url.pathname);
-
-    if (url.pathname === "/") {
-      return new Response("Hello from Loggable DO!");
-    }
-
-    if (url.pathname === "/error") {
-      this.log("error", "Simulated error occurred");
-      return new Response("Error logged", { status: 500 });
-    }
-
-    if (url.pathname === "/warning") {
-      this.log("warn", "Simulated warning occurred");
-      return new Response("Warning logged");
-    }
-
-    return new Response("Not found", { status: 404 });
-  }
-}
-
-// Worker handler
-export default {
-  async fetch(request: Request, env: any): Promise<Response> {
-    const doId = env.EXAMPLE_LOG_DO.idFromName("example-log-instance");
-    const doStub = env.EXAMPLE_LOG_DO.get(doId);
-    return doStub.fetch(request);
-  },
-};
-```
-
-## Development
-
-1. Set up your `wrangler.toml`:
-
-```toml
-name = "loggable-object-example"
-main = "src/index.ts"
-compatibility_date = "2023-09-01"
-
-[[durable_objects.bindings]]
-name = "EXAMPLE_LOG_DO"
-class_name = "ExampleLogDO"
-```
-
-2. Start development:
-
-```bash
-wrangler dev
-```
-
-3. Test the endpoints:
-   - `http://localhost:8787/` - Main page
-   - `http://localhost:8787/log` - Live log stream
-   - `http://localhost:8787/error` - Trigger an error log
-   - `http://localhost:8787/warning` - Trigger a warning log
+See [example.ts](example.ts) and [wrangler.toml](wrangler.toml)
 
 ## Technical Details
 
@@ -192,10 +123,8 @@ wrangler dev
 
 ## TypeScript Support
 
-The package includes full TypeScript definitions. The `@Loggable` decorator properly types the `log` method:
+The package includes full TypeScript definitions. The `@Loggable` decorator provides the `log` method, but you still need to type it like this:
 
 ```typescript
-log: Log; // (type: LogLevel, ...data: any[]) => void
+log: Log;
 ```
-
-Where `LogLevel` is `"log" | "warn" | "error"`.
