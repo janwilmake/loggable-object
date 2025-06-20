@@ -116,7 +116,7 @@ See [example.ts](example.ts) and [wrangler.toml](wrangler.toml)
 ## Technical Details
 
 - **Storage**: Uses SQLite storage with automatic table creation
-- **Retention**: Logs older than 30 days are automatically cleaned up
+- **Retention**: Logs older than 30 days are automatically cleaned up (NB: Only if new logs come in!)
 - **Performance**: Indexed by timestamp for efficient querying
 - **Streaming**: Uses TransformStream for real-time log delivery
 - **Memory**: Logs are streamed directly from storage, no memory buffering
