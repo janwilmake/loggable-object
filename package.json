@@ -1,6 +1,6 @@
 {
   "name": "loggable-object",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "loggable-object.ts",
   "files": [
     "loggable-object.ts"

@@ -152,7 +152,7 @@ export function Loggable<T extends new (...args: any[]) => DurableObject>(
         .one();
       const total = countResult.count as number;
 
-      // Order by timestamp ASC (oldest first, newest last)
+      // Order by timestamp ASC (newest last)
       query += ` ORDER BY timestamp ASC`;
 
       if (filter.limit) {
@@ -167,7 +167,9 @@ export function Loggable<T extends new (...args: any[]) => DurableObject>(
 
       const logs = this.ctx.storage.sql
         .exec<LogEntry>(query, ...params)
-        .toArray();
+        .toArray()
+        // reverse order to show oldest first (but have limit)
+        .reverse();
       return { logs, total };
     }
 
