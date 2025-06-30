@@ -152,8 +152,8 @@ export function Loggable<T extends new (...args: any[]) => DurableObject>(
         .one();
       const total = countResult.count as number;
 
-      // Order by timestamp ASC (newest last)
-      query += ` ORDER BY timestamp ASC`;
+      // Order by timestamp DESC (newest last)
+      query += ` ORDER BY timestamp DESC`;
 
       if (filter.limit) {
         query += ` LIMIT ?`;
